@@ -13,14 +13,14 @@
   </div>
 
   <!-- Form content -->
-  <ng-container *ngIf="!loading && !error && (currentQuestion$ | async) as question">
+  <ng-container *ngIf="!loading && !error && currentQuestion">
     <div class="card">
       <div class="card-header">
-        <h2>{{ question.name }}</h2>
+        <h2>{{ currentQuestion.name }}</h2>
       </div>
       <div class="card-body">
         <form #formElement="ngForm">
-          <div *ngFor="let field of question.subTypes" class="form-group mb-3">
+          <div *ngFor="let field of currentQuestion.subTypes" class="form-group mb-3">
             <!-- Input field -->
             <ng-container *ngIf="field.type === 'input'">
               <label [for]="field.id">{{ field.label }}</label>
@@ -29,8 +29,8 @@
                 class="form-control" 
                 [id]="field.id"
                 name="{{field.id}}"
-                [(ngModel)]="formData[question.id][field.id]"
-                (ngModelChange)="updateFormValue(question.id, field.id, $event)">
+                [(ngModel)]="formData[currentQuestion.id][field.id]"
+                (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
             </ng-container>
 
             <!-- Radio buttons -->
@@ -44,8 +44,8 @@
                     [id]="field.id + '-' + option.value"
                     [value]="option.value"
                     name="{{field.id}}"
-                    [(ngModel)]="formData[question.id][field.id]"
-                    (ngModelChange)="updateFormValue(question.id, field.id, $event)">
+                    [(ngModel)]="formData[currentQuestion.id][field.id]"
+                    (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
                   <label class="form-check-label" [for]="field.id + '-' + option.value">
                     {{ option.label || option.value }}
                   </label>
@@ -60,8 +60,8 @@
                 class="form-select" 
                 [id]="field.id"
                 name="{{field.id}}"
-                [(ngModel)]="formData[question.id][field.id]"
-                (ngModelChange)="updateFormValue(question.id, field.id, $event)">
+                [(ngModel)]="formData[currentQuestion.id][field.id]"
+                (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
                 <option value="">Select an option</option>
                 <option *ngFor="let option of field.options" [value]="option.value">
                   {{ option.label }}
@@ -77,8 +77,8 @@
                   class="form-check-input" 
                   [id]="field.id"
                   name="{{field.id}}"
-                  [(ngModel)]="formData[question.id][field.id]"
-                  (ngModelChange)="updateFormValue(question.id, field.id, $event)">
+                  [(ngModel)]="formData[currentQuestion.id][field.id]"
+                  (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
                 <label class="form-check-label" [for]="field.id">
                   {{ field.label }}
                 </label>
@@ -90,12 +90,12 @@
       <div class="card-footer d-flex justify-content-between">
         <button 
           class="btn btn-secondary" 
-          [disabled]="!(canGoPrevious$ | async)"
+          [disabled]="!canGoPrevious"
           (click)="previous()">
           Back
         </button>
         
-        <ng-container *ngIf="canGoNext$ | async; else submitButton">
+        <ng-container *ngIf="canGoNext; else submitButton">
           <button 
             class="btn btn-primary"
             (click)="next()">
@@ -115,10 +115,10 @@
   </ng-container>
 
   <!-- Debug information -->
-  <div class="debug-info" *ngIf="!loading && !error && !(currentQuestion$ | async)">
+  <div class="debug-info" *ngIf="!loading && !error && !currentQuestion">
     <h3>No question data available</h3>
     <p>Please check the console for more information.</p>
-    <button class="btn btn-secondary" (click)="ngOnInit()">Reload Data</button>
+    <button class="btn btn-secondary" (click)="reloadData()">Reload Data</button>
   </div>
   
   <!-- Form Data Debug View -->

@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { FormBuilder } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
 
 export interface QuestionOption {
   value: string;
@@ -27,90 +24,152 @@ export interface QuestionsData {
   questions: Question[];
 }
 
+/**
+ * Event listener interface for handling form navigation events
+ */
+export interface FormEventListener {
+  onQuestionChange(question: Question | null): void;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class FormService {
-  private questionsData = new BehaviorSubject<Question[]>([]);
-  public questions$ = this.questionsData.asObservable();
+  // Store questions data
+  private questions: Question[] = [];
   
-  private currentIndexSubject = new BehaviorSubject<number>(0);
-  public currentIndex$ = this.currentIndexSubject.asObservable();
+  // Keep track of the current index
+  private currentIndex: number = 0;
   
-  public  currentQuestion$ = this.currentIndex$.pipe(
-    map(index => {
-      const questions = this.questionsData.getValue();
-      return questions.length > 0 ? questions[index] : null;
-    })
-  );
+  // Event listeners for navigation
+  private eventListeners: FormEventListener[] = [];
 
-  constructor(private http: HttpClient, private fb: FormBuilder) {}
+  constructor(private http: HttpClient) {}
 
-  loadQuestions(): Observable<Question[]> {
+  /**
+   * Load questions from the JSON file
+   * @param callback Function to call when questions are loaded
+   */
+  loadQuestions(callback?: (success: boolean) => void): void {
     console.log('Loading questions from mock-data.json');
-    return this.http.get<QuestionsData>('assets/mock-data.json').pipe(
-      tap(data => console.log('Received data:', data)),
-      map(data => data.questions),
-      tap(questions => {
-        console.log('Processed questions:', questions);
-        this.questionsData.next(questions);
-      })
-    );
+    
+    this.http.get<QuestionsData>('assets/mock-data.json').subscribe({
+      next: (data) => {
+        console.log('Received data:', data);
+        this.questions = data.questions;
+        console.log('Processed questions:', this.questions);
+        this.notifyListeners();
+        if (callback) callback(true);
+      },
+      error: (error) => {
+        console.error('Error loading questions:', error);
+        if (callback) callback(false);
+      }
+    });
   }
 
-  navigateToQuestion(id: string): void {
-    const questions = this.questionsData.getValue();
-    const index = questions.findIndex(q => q.id === id);
+  /**
+   * Navigate to a specific question by ID
+   */
+  navigateToQuestion(id: string): boolean {
+    const index = this.questions.findIndex(q => q.id === id);
     
     if (index !== -1) {
-      this.currentIndexSubject.next(index);
+      this.currentIndex = index;
+      this.notifyListeners();
+      return true;
     }
+    return false;
   }
 
-  nextQuestion(): void {
-    const currentIndex = this.currentIndexSubject.getValue();
-    const questions = this.questionsData.getValue();
-    
-    if (currentIndex < questions.length - 1) {
-      this.currentIndexSubject.next(currentIndex + 1);
+  /**
+   * Go to next question
+   */
+  nextQuestion(): boolean {
+    if (this.currentIndex < this.questions.length - 1) {
+      this.currentIndex++;
+      this.notifyListeners();
+      return true;
     }
+    return false;
   }
 
-  previousQuestion(): void {
-    const currentIndex = this.currentIndexSubject.getValue();
-    
-    if (currentIndex > 0) {
-      this.currentIndexSubject.next(currentIndex - 1);
+  /**
+   * Go to previous question
+   */
+  previousQuestion(): boolean {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      this.notifyListeners();
+      return true;
     }
+    return false;
   }
 
-  canGoNext(): Observable<boolean> {
-    return this.currentIndex$.pipe(
-      map(index => {
-        const questions = this.questionsData.getValue();
-        return index < questions.length - 1;
-      })
-    );
+  /**
+   * Check if we can go to the next question
+   */
+  canGoNext(): boolean {
+    return this.currentIndex < this.questions.length - 1;
   }
 
-  canGoPrevious(): Observable<boolean> {
-    return this.currentIndex$.pipe(
-      map(index => index > 0)
-    );
+  /**
+   * Check if we can go to the previous question
+   */
+  canGoPrevious(): boolean {
+    return this.currentIndex > 0;
   }
 
-  getCurrentQuestionId(): Observable<string | null> {
-    return this.currentQuestion$.pipe(
-      map(question => question ? question.id : null)
-    );
+  /**
+   * Get the current question's ID
+   */
+  getCurrentQuestionId(): string | null {
+    const currentQuestion = this.getCurrentQuestion();
+    return currentQuestion ? currentQuestion.id : null;
   }
   
-  // Get the current question synchronously
+  /**
+   * Get the current question
+   */
   getCurrentQuestion(): Question | null {
-    const questions = this.questionsData.getValue();
-    const currentIndex = this.currentIndexSubject.getValue();
-    return questions.length > 0 && currentIndex >= 0 && currentIndex < questions.length 
-      ? questions[currentIndex] 
+    return this.questions.length > 0 && 
+           this.currentIndex >= 0 && 
+           this.currentIndex < this.questions.length 
+      ? this.questions[this.currentIndex] 
       : null;
+  }
+  
+  /**
+   * Get all questions
+   */
+  getQuestions(): Question[] {
+    return [...this.questions]; // Return a copy to prevent mutation
+  }
+  
+  /**
+   * Register a listener for question changes
+   */
+  registerListener(listener: FormEventListener): void {
+    this.eventListeners.push(listener);
+  }
+  
+  /**
+   * Remove a listener
+   */
+  removeListener(listener: FormEventListener): void {
+    const index = this.eventListeners.indexOf(listener);
+    if (index !== -1) {
+      this.eventListeners.splice(index, 1);
+    }
+  }
+  
+  /**
+   * Notify all listeners about question changes
+   */
+  private notifyListeners(): void {
+    const currentQuestion = this.getCurrentQuestion();
+    this.eventListeners.forEach(listener => {
+      listener.onQuestionChange(currentQuestion);
+    });
   }
 }
