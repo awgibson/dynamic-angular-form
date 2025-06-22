@@ -10,6 +10,7 @@ export interface QuestionSubType {
   type: string;
   id: string;
   label: string;
+  required?: boolean;
   options?: QuestionOption[];
 }
 

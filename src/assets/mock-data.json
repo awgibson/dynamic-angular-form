@@ -8,12 +8,14 @@
         {
           "type": "input",
           "id": "address",
-          "label": "Enter your Address"
+          "label": "Enter your Address",
+          "required": true
         },
         {
           "type": "radio",
           "id": "addressType",
           "label": "Address Type",
+          "required": true,
           "options": [
             {
               "value": "mailing",
@@ -35,17 +37,20 @@
         {
           "type": "input",
           "id": "fullName",
-          "label": "Full Name"
+          "label": "Full Name",
+          "required": true
         },
         {
           "type": "input",
           "id": "email",
-          "label": "Email Address"
+          "label": "Email Address",
+          "required": true
         },
         {
           "type": "select",
           "id": "age",
           "label": "Age Range",
+          "required": false,
           "options": [
             {
               "value": "18-24",
@@ -75,12 +80,14 @@
         {
           "type": "checkbox",
           "id": "newsletter",
-          "label": "Subscribe to newsletter"
+          "label": "Subscribe to newsletter",
+          "required": false
         },
         {
           "type": "radio",
           "id": "contactPreference",
           "label": "Preferred contact method",
+          "required": true,
           "options": [
             {
               "value": "email",

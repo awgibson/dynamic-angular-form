@@ -23,43 +23,60 @@
           <div *ngFor="let field of currentQuestion.subTypes" class="form-group mb-3">
             <!-- Input field -->
             <ng-container *ngIf="field.type === 'input'">
-              <label [for]="field.id">{{ field.label }}</label>
+              <label [for]="field.id">
+                {{ field.label }} <span class="text-danger" *ngIf="field.required">*</span>
+              </label>
               <input 
                 type="text" 
                 class="form-control" 
                 [id]="field.id"
                 name="{{field.id}}"
+                [ngClass]="{'is-invalid': hasError(field.id)}"
                 [(ngModel)]="formData[currentQuestion.id][field.id]"
                 (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
+              <div *ngIf="hasError(field.id)" class="invalid-feedback">
+                {{ getErrorMessage(field.id) }}
+              </div>
             </ng-container>
 
             <!-- Radio buttons -->
             <ng-container *ngIf="field.type === 'radio' && field.options">
-              <label class="form-label">{{ field.label }}</label>
-              <div class="radio-group">
-                <div *ngFor="let option of field.options" class="form-check">
-                  <input 
-                    type="radio" 
-                    class="form-check-input"
-                    [id]="field.id + '-' + option.value"
-                    [value]="option.value"
-                    name="{{field.id}}"
-                    [(ngModel)]="formData[currentQuestion.id][field.id]"
-                    (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
-                  <label class="form-check-label" [for]="field.id + '-' + option.value">
-                    {{ option.label || option.value }}
-                  </label>
+              <div [ngClass]="{'is-invalid': hasError(field.id)}">
+                <label class="form-label">
+                  {{ field.label }} <span class="text-danger" *ngIf="field.required">*</span>
+                </label>
+                <div class="radio-group">
+                  <div *ngFor="let option of field.options" class="form-check">
+                    <input 
+                      type="radio" 
+                      class="form-check-input"
+                      [id]="field.id + '-' + option.value"
+                      [value]="option.value"
+                      [ngClass]="{'is-invalid': hasError(field.id)}"
+                      name="{{field.id}}"
+                      [(ngModel)]="formData[currentQuestion.id][field.id]"
+                      (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
+                    <label class="form-check-label" [for]="field.id + '-' + option.value">
+                      {{ option.label || option.value }}
+                    </label>
+                  </div>
+                </div>
+                <div *ngIf="hasError(field.id)" class="invalid-feedback">
+                  {{ getErrorMessage(field.id) }}
                 </div>
               </div>
             </ng-container>
 
             <!-- Select dropdown -->
             <ng-container *ngIf="field.type === 'select' && field.options">
-              <label [for]="field.id">{{ field.label }}</label>
+              <label [for]="field.id">
+                {{ field.label }} <span class="text-danger" *ngIf="field.required">*</span>
+              </label>
               <select 
                 class="form-select" 
                 [id]="field.id"
                 name="{{field.id}}"
+                [ngClass]="{'is-invalid': hasError(field.id)}"
                 [(ngModel)]="formData[currentQuestion.id][field.id]"
                 (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
                 <option value="">Select an option</option>
@@ -67,6 +84,9 @@
                   {{ option.label }}
                 </option>
               </select>
+              <div *ngIf="hasError(field.id)" class="invalid-feedback">
+                {{ getErrorMessage(field.id) }}
+              </div>
             </ng-container>
 
             <!-- Checkbox -->
@@ -76,40 +96,55 @@
                   type="checkbox" 
                   class="form-check-input" 
                   [id]="field.id"
+                  [ngClass]="{'is-invalid': hasError(field.id)}"
                   name="{{field.id}}"
                   [(ngModel)]="formData[currentQuestion.id][field.id]"
                   (ngModelChange)="updateFormValue(currentQuestion.id, field.id, $event)">
                 <label class="form-check-label" [for]="field.id">
-                  {{ field.label }}
+                  {{ field.label }} <span class="text-danger" *ngIf="field.required">*</span>
                 </label>
+                <div *ngIf="hasError(field.id)" class="invalid-feedback">
+                  {{ getErrorMessage(field.id) }}
+                </div>
               </div>
             </ng-container>
           </div>
         </form>
       </div>
-      <div class="card-footer d-flex justify-content-between">
-        <button 
-          class="btn btn-secondary" 
-          [disabled]="!canGoPrevious"
-          (click)="previous()">
-          Back
-        </button>
+      <div class="card-footer">
+        <div class="validation-summary mb-3" *ngIf="!pageValid">
+          <div class="alert alert-danger">
+            <strong>Please correct the following errors:</strong>
+            <ul>
+              <li *ngFor="let error of validationErrors | keyvalue">{{ error.value }}</li>
+            </ul>
+          </div>
+        </div>
         
-        <ng-container *ngIf="canGoNext; else submitButton">
+        <div class="d-flex justify-content-between">
           <button 
-            class="btn btn-primary"
-            (click)="next()">
-            Continue
+            class="btn btn-secondary" 
+            [disabled]="!canGoPrevious"
+            (click)="previous()">
+            Back
           </button>
-        </ng-container>
-        
-        <ng-template #submitButton>
-          <button 
-            class="btn btn-success"
-            (click)="onSubmit()">
-            Submit
-          </button>
-        </ng-template>
+          
+          <ng-container *ngIf="canGoNext; else submitButton">
+            <button 
+              class="btn btn-primary"
+              (click)="next()">
+              Continue
+            </button>
+          </ng-container>
+          
+          <ng-template #submitButton>
+            <button 
+              class="btn btn-success"
+              (click)="onSubmit()">
+              Submit
+            </button>
+          </ng-template>
+        </div>
       </div>
     </div>
   </ng-container>
