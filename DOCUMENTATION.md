@@ -13,8 +13,9 @@ This documentation provides a detailed guide to the Angular dynamic form applica
 5. [Validation System](#validation-system)
 6. [UI Features - Theme & Font Size](#ui-features)
 7. [Complex Components](#complex-components)
-8. [Extending the Application](#extending-the-application)
-9. [Examples](#examples)
+8. [Component Data Flow](#component-data-flow)
+9. [Extending the Application](#extending-the-application)
+10. [Examples](#examples)
 
 ## Architecture Overview
 
@@ -201,6 +202,181 @@ Demonstrates how to build a component with multiple fields that functions as a s
   (valueChange)="updateComplexValue(currentQuestion.id, field.id, $event)"
   (validationChange)="onComplexValidationChange(currentQuestion.id, field.id, $event)">
 </app-complex-address>
+```
+
+## Component Data Flow
+
+This section visualizes the flow of data between components in the application, focusing on inputs, outputs, and how they interact.
+
+### Component Relationships Diagram
+
+```
+┌─────────────────┐      ┌───────────────┐      ┌─────────────────┐
+│                 │      │               │      │                 │
+│  AppComponent   │─────▶│  FormService  │◀─────│   JSON Config   │
+│                 │      │               │      │                 │
+└────────┬────────┘      └───────┬───────┘      └─────────────────┘
+         │                       │
+         │                       │ (Questions data)
+         ▼                       ▼
+┌─────────────────────────────────────────────┐
+│                                             │
+│          DynamicFormComponent               │
+│                                             │
+│  ┌─────────────┐  ┌─────────────────────┐   │
+│  │ Basic Fields │  │ Complex Components  │   │
+│  └─────────────┘  └─────────────────────┘   │
+│                                             │
+└───────────────────┬─────────────────────────┘
+                    │
+                    ▼
+       ┌─────────────────────────────┐
+       │                             │
+       │    ComplexAddressComponent  │
+       │                             │
+       └─────────────────────────────┘
+```
+
+### Component Inputs & Outputs
+
+#### DynamicFormComponent
+
+**Receives From:**
+- **FormService**:
+  - Form configuration data (questions, fields)
+  - Current page information
+  - Navigation state (canGoNext, canGoPrevious)
+
+**Sends To:**
+- **FormService**:
+  - Navigation requests (next, previous)
+  - Form data updates
+  
+- **Complex Components**:
+  - Initial field values (`[value]`)
+  - Validation state (`[showValidationFlag]`)
+  - Required status (`[required]`)
+  - Page and field identifiers (`[parentId]`, `[fieldId]`)
+
+#### ComplexAddressComponent
+
+**Inputs:**
+- `value`: The current address data object
+- `required`: Boolean indicating if the address is required
+- `showValidationFlag`: Boolean to display validation errors
+- `parentId`: ID of the parent form page
+- `fieldId`: ID of this component in the parent form
+
+**Outputs:**
+- `valueChange`: Emits updated address object when any field changes
+- `validationChange`: Emits boolean validation status when validation state changes
+
+### Data Flow for Validation
+
+```
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│ ComplexAddressComponent                         │
+│                                                 │
+│ ┌───────────────┐       ┌────────────────────┐  │
+│ │ Field Changes │─────▶ │validateField()     │  │
+│ └───────────────┘       └────────┬───────────┘  │
+│                                  │              │
+│                                  ▼              │
+│                         ┌────────────────────┐  │
+│                         │emitValidationStatus│  │
+│                         └────────┬───────────┘  │
+│                                  │              │
+└──────────────────────────────────┼──────────────┘
+                                   │
+                                   │ (validationChange)
+                                   ▼
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│ DynamicFormComponent                            │
+│                                                 │
+│ ┌──────────────────────────┐                    │
+│ │onComplexValidationChange │                    │
+│ └──────────────┬───────────┘                    │
+│                │                                │
+│                ▼                                │
+│    ┌──────────────────────┐                    │
+│    │Update validationErrors│                    │
+│    │Update pageValid      │                    │
+│    └──────────────────────┘                    │
+│                                                │
+└────────────────────────────────────────────────┘
+```
+
+### Data Flow for Value Updates
+
+```
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│ ComplexAddressComponent                         │
+│                                                 │
+│ ┌───────────────┐       ┌────────────────────┐  │
+│ │ updateValue() │─────▶ │Update internal state│  │
+│ └───────────────┘       └────────┬───────────┘  │
+│                                  │              │
+│                                  ▼              │
+│                         ┌────────────────────┐  │
+│                         │Emit valueChange    │  │
+│                         └────────┬───────────┘  │
+│                                  │              │
+└──────────────────────────────────┼──────────────┘
+                                   │
+                                   │ (valueChange)
+                                   ▼
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│ DynamicFormComponent                            │
+│                                                 │
+│ ┌──────────────────────────┐                    │
+│ │updateComplexValue()      │                    │
+│ └──────────────┬───────────┘                    │
+│                │                                │
+│                ▼                                │
+│    ┌──────────────────────┐                    │
+│    │Update formData       │                    │
+│    │Validate field        │                    │
+│    └──────────────────────┘                    │
+│                                                │
+└────────────────────────────────────────────────┘
+```
+
+### Navigation Flow
+
+```
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│ DynamicFormComponent                            │
+│                                                 │
+│ ┌───────────────┐       ┌────────────────────┐  │
+│ │ next() called │─────▶ │showValidationErrors│  │
+│ └───────────────┘       │= true              │  │
+│                         └────────┬───────────┘  │
+│                                  │              │
+│                                  ▼              │
+│                         ┌────────────────────┐  │
+│                         │validateCurrentPage()│  │
+│                         └────────┬───────────┘  │
+│                                  │              │
+│                  ┌───────────────┴──────────┐   │
+│                  │                          │   │
+│                  ▼                          ▼   │
+│      ┌───────────────────┐   ┌────────────────┐ │
+│      │If invalid: show   │   │If valid: proceed│ │
+│      │errors & stop      │   │to next question │ │
+│      └───────────────────┘   └────────┬───────┘ │
+│                                       │         │
+└───────────────────────────────────────┼─────────┘
+                                        │
+                                        ▼
+                               ┌────────────────┐
+                               │  FormService   │
+                               │  nextQuestion()│
+                               └────────────────┘
 ```
 
 ## Extending the Application
