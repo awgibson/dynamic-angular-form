@@ -131,6 +131,22 @@ pre, code {
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 0.5rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* JSON formatting improvements */
+.json-key {
+  color: var(--primary-color);
+}
+
+.json-string {
+  color: var(--error-color);
+}
+
+.json-number {
+  color: var(--primary-hover-color);
 }
 
 .form-check-input[type="checkbox"] {
