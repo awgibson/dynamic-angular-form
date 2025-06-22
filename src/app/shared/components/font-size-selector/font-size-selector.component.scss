@@ -1,0 +1,60 @@
+.font-size-selector {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+.font-size-options {
+  display: flex;
+  align-items: center;
+}
+
+.font-size-option {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: var(--hover-bg-color, rgba(0, 0, 0, 0.1));
+  }
+  
+  &.active {
+    background-color: var(--active-bg-color, rgba(13, 110, 253, 0.25));
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--focus-color, #86b7fe);
+  }
+}
+
+.size-label {
+  display: inline-block;
+  font-weight: bold;
+
+  &.text-small {
+    font-size: 0.85rem;
+  }
+  
+  &.text-medium {
+    font-size: 1rem;
+  }
+  
+  &.text-large {
+    font-size: 1.15rem;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
