@@ -20,6 +20,9 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
 
   // Validation state for the entire page
   pageValid = true;
+  
+  // Track if validation has been triggered (only show errors after user tries to navigate)
+  showValidationErrors = false;
 
   constructor(
     private formService: FormService,
@@ -78,6 +81,7 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
     // Reset validation state when changing questions
     this.validationErrors = {};
     this.pageValid = true;
+    this.showValidationErrors = false;
     
     if (question) {
       // Initialize formData for this page if not exist
@@ -134,24 +138,37 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
   }
 
   next(): void {
+    // Set the flag to show validation errors
+    this.showValidationErrors = true;
+    
     // First validate the current page
     if (!this.validateCurrentPage()) {
       console.log('Validation failed. Cannot proceed.');
+      // Scroll to top to show validation messages
+      window.scrollTo(0, 0);
       return;
     }
     
+    // Reset validation flag when navigating
+    this.showValidationErrors = false;
     this.formService.nextQuestion();
   }
 
   previous(): void {
     // No validation needed when going back
+    this.showValidationErrors = false;
     this.formService.previousQuestion();
   }
 
   onSubmit(): void {
+    // Set the flag to show validation errors
+    this.showValidationErrors = true;
+    
     // Validate before submitting
     if (!this.validateCurrentPage()) {
       console.log('Validation failed. Cannot submit.');
+      // Scroll to top to show validation messages
+      window.scrollTo(0, 0);
       return;
     }
     
@@ -168,7 +185,7 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
     this.formData[pageId][fieldId] = value;
     console.log(`Updated field: ${pageId}.${fieldId} = ${value}`);
     
-    // Validate the field after it's updated
+    // Silently validate the field after it's updated
     if (this.currentQuestion) {
       const field = this.currentQuestion.subTypes.find(f => f.id === fieldId);
       if (field && field.required) {
