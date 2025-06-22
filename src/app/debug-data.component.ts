@@ -15,16 +15,28 @@ import { HttpClient } from '@angular/common/http';
   styles: [`
     .debug-container {
       padding: 20px;
-      background-color: #f8f9fa;
+      background-color: var(--debug-bg-color, #f8f9fa);
       border-radius: 5px;
       margin-top: 20px;
+      border: 1px solid var(--border-color, #ced4da);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      color: var(--text-color, #333333);
     }
     pre {
-      background-color: #e9ecef;
+      background-color: var(--debug-code-bg-color, #e9ecef);
       padding: 10px;
       border-radius: 3px;
       max-height: 300px;
       overflow: auto;
+      color: var(--text-color, #333333);
+      border: 1px solid var(--border-color, #ced4da);
+    }
+    button {
+      margin-top: 10px;
+    }
+    h3 {
+      margin-bottom: 15px;
+      color: var(--text-color, #333333);
     }
   `]
 })
