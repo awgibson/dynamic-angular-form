@@ -5,11 +5,11 @@
 }
 
 .card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px var(--shadow-color, rgba(0, 0, 0, 0.1));
   margin-bottom: 20px;
   background-color: var(--card-bg-color, #ffffff);
   border: 1px solid var(--border-color, #ced4da);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-header {
@@ -137,19 +137,30 @@ label {
   border: 1px solid #ddd;
 }
 
+.form-data-debug {
+  margin-top: 2rem;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: var(--card-bg-color, #ffffff);
+  border: 1px solid var(--border-color, #ced4da);
+  box-shadow: 0 4px 8px var(--shadow-color, rgba(0, 0, 0, 0.1));
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
 .form-data-debug h4 {
   margin-bottom: 15px;
-  color: #333;
+  color: var(--text-color, #333);
 }
 
 .form-data-debug pre {
-  background-color: #fff;
+  background-color: var(--debug-code-bg-color, #e9ecef);
   padding: 10px;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color, #ced4da);
   max-height: 300px;
   overflow: auto;
   font-family: monospace;
   font-size: 14px;
   white-space: pre-wrap;
+  color: var(--text-color, #333);
 }
