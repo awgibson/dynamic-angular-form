@@ -12,6 +12,7 @@ export interface QuestionSubType {
   label: string;
   required?: boolean;
   options?: QuestionOption[];
+  complexData?: any; // For storing any complex component data
 }
 
 export interface Question {

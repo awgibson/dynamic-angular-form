@@ -1,0 +1,125 @@
+<div class="complex-address-container">
+  <div class="address-fields">
+    <!-- Street Address -->
+    <div class="form-group">
+      <label for="{{fieldId}}-street">
+        Street Address <span class="text-danger" *ngIf="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        class="form-control" 
+        [id]="fieldId + '-street'"
+        name="{{fieldId}}-street"
+        [ngClass]="{'is-invalid': showValidation && hasError('street')}"
+        [value]="value.street"
+        (input)="updateValue('street', $event.target.value)">
+      <div *ngIf="showValidation && hasError('street')" class="invalid-feedback">
+        {{ getErrorMessage('street') }}
+      </div>
+    </div>
+
+    <!-- City & State -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="{{fieldId}}-city">
+          City <span class="text-danger" *ngIf="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [id]="fieldId + '-city'"
+          name="{{fieldId}}-city"
+          [ngClass]="{'is-invalid': showValidation && hasError('city')}"
+          [value]="value.city"
+          (input)="updateValue('city', $event.target.value)">
+        <div *ngIf="showValidation && hasError('city')" class="invalid-feedback">
+          {{ getErrorMessage('city') }}
+        </div>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label for="{{fieldId}}-state">
+          State <span class="text-danger" *ngIf="required">*</span>
+        </label>
+        <select 
+          class="form-select" 
+          [id]="fieldId + '-state'"
+          name="{{fieldId}}-state"
+          [ngClass]="{'is-invalid': showValidation && hasError('state')}"
+          [value]="value.state"
+          (change)="updateValue('state', $event.target.value)">
+          <option value="">Select a state</option>
+          <option *ngFor="let state of states" [value]="state.value">
+            {{ state.label }}
+          </option>
+        </select>
+        <div *ngIf="showValidation && hasError('state')" class="invalid-feedback">
+          {{ getErrorMessage('state') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Zip & Country -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="{{fieldId}}-zipCode">
+          ZIP Code <span class="text-danger" *ngIf="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [id]="fieldId + '-zipCode'"
+          name="{{fieldId}}-zipCode"
+          [ngClass]="{'is-invalid': showValidation && hasError('zipCode')}"
+          [value]="value.zipCode"
+          (input)="updateValue('zipCode', $event.target.value)">
+        <div *ngIf="showValidation && hasError('zipCode')" class="invalid-feedback">
+          {{ getErrorMessage('zipCode') }}
+        </div>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label for="{{fieldId}}-country">
+          Country <span class="text-danger" *ngIf="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [id]="fieldId + '-country'"
+          name="{{fieldId}}-country"
+          [ngClass]="{'is-invalid': showValidation && hasError('country')}"
+          [value]="value.country"
+          (input)="updateValue('country', $event.target.value)">
+        <div *ngIf="showValidation && hasError('country')" class="invalid-feedback">
+          {{ getErrorMessage('country') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Address Type -->
+    <div class="form-group">
+      <label class="form-label">
+        Address Type <span class="text-danger" *ngIf="required">*</span>
+      </label>
+      <div class="radio-group">
+        <div *ngFor="let type of addressTypes" class="form-check">
+          <input 
+            type="radio" 
+            class="form-check-input"
+            [id]="fieldId + '-addressType-' + type.value"
+            [value]="type.value"
+            [checked]="value.addressType === type.value"
+            name="{{fieldId}}-addressType"
+            [ngClass]="{'is-invalid': showValidation && hasError('addressType')}"
+            (change)="updateValue('addressType', type.value)">
+          <label class="form-check-label" [for]="fieldId + '-addressType-' + type.value">
+            {{ type.label }}
+          </label>
+        </div>
+      </div>
+      <div *ngIf="showValidation && hasError('addressType')" class="invalid-feedback">
+        {{ getErrorMessage('addressType') }}
+      </div>
+    </div>
+  </div>
+</div>

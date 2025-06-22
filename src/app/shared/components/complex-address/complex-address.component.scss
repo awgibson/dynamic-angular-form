@@ -1,0 +1,48 @@
+.complex-address-container {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 15px;
+  background-color: var(--card-bg-color);
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -10px;
+  margin-left: -10px;
+  margin-bottom: 15px;
+}
+
+.form-row > .form-group {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.col-md-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+@media (max-width: 768px) {
+  .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 15px;
+  }
+}
+
+.address-fields .form-group:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form-check {
+  min-width: 100px;
+}

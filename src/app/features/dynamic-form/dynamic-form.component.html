@@ -118,6 +118,24 @@
                 </div>
               </div>
             </ng-container>
+
+            <!-- Complex Address Component -->
+            <ng-container *ngIf="field.type === 'complex-address'">
+              <label>
+                {{ field.label }} <span class="text-danger" *ngIf="field.required">*</span>
+              </label>
+              <app-complex-address
+                [value]="formData[currentQuestion.id][field.id]"
+                [required]="field.required"
+                [showValidation]="showValidationErrors"
+                [parentId]="currentQuestion.id"
+                [fieldId]="field.id"
+                (valueChange)="updateComplexValue(currentQuestion.id, field.id, $event)">
+              </app-complex-address>
+              <div *ngIf="showValidationErrors && hasError(field.id)" class="invalid-feedback">
+                {{ getErrorMessage(field.id) }}
+              </div>
+            </ng-container>
           </div>
         </form>
       </div>

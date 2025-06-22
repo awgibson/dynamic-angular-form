@@ -6,26 +6,10 @@
       "type": "group",
       "subTypes": [
         {
-          "type": "input",
-          "id": "address",
-          "label": "Enter your Address",
+          "type": "complex-address",
+          "id": "complexAddress",
+          "label": "Complete Address Information",
           "required": true
-        },
-        {
-          "type": "radio",
-          "id": "addressType",
-          "label": "Address Type",
-          "required": true,
-          "options": [
-            {
-              "value": "mailing",
-              "label": "Mailing"
-            },
-            {
-              "value": "legal",
-              "label": "Legal"
-            }
-          ]
         }
       ]
     },

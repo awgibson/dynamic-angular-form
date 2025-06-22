@@ -98,6 +98,16 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
         } else if (field.type === 'radio' && field.options && field.options.length > 0) {
           // For radio buttons, don't pre-select any option
           defaultValue = '';
+        } else if (field.type === 'complex-address') {
+          // For complex address, initialize with a default address structure
+          defaultValue = {
+            street: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            country: 'USA',
+            addressType: ''
+          };
         }
         
         // Initialize the field value in formData if not exists
@@ -199,8 +209,41 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
       // Update page validity
       this.pageValid = Object.keys(this.validationErrors).length === 0;
     }
-    
-    console.log('Current formData:', this.formData);
+  }
+
+  // Handle complex component value changes
+  updateComplexValue(pageId: string, fieldId: string, value: any): void {
+    if (!this.formData[pageId]) {
+      this.formData[pageId] = {};
+    }
+    this.formData[pageId][fieldId] = value;
+    console.log(`Updated complex field: ${pageId}.${fieldId}`, value);
+
+    // Validate complex field
+    if (this.currentQuestion) {
+      const field = this.currentQuestion.subTypes.find(f => f.id === fieldId);
+      if (field && field.required) {
+        // Check if all required properties in the complex object have values
+        if (!value || !this.validateComplexField(value)) {
+          this.validationErrors[fieldId] = `${field.label} has missing required information`;
+        } else {
+          // Clear the error if value is now valid
+          delete this.validationErrors[fieldId];
+        }
+      }
+      // Update page validity
+      this.pageValid = Object.keys(this.validationErrors).length === 0;
+    }
+  }
+
+  // Helper method to validate complex fields
+  validateComplexField(value: any): boolean {
+    // If it's an address object, check that all required fields are filled
+    if (value.street !== undefined) {
+      return value.street && value.city && value.state && value.zipCode && value.country && value.addressType;
+    }
+    // Add more complex field validation as needed
+    return true;
   }
   
   // Method to reload form data if needed

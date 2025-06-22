@@ -5,11 +5,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormService } from './services/form.service';
 import { ThemeToggleComponent } from './components/theme-toggle/theme-toggle.component';
 import { FontSizeSelectorComponent } from './components/font-size-selector/font-size-selector.component';
+import { ComplexAddressComponent } from './components/complex-address/complex-address.component';
 
 @NgModule({
   declarations: [
     ThemeToggleComponent,
-    FontSizeSelectorComponent
+    FontSizeSelectorComponent,
+    ComplexAddressComponent
   ],
   imports: [
     CommonModule,
@@ -23,6 +25,7 @@ import { FontSizeSelectorComponent } from './components/font-size-selector/font-
     ReactiveFormsModule,
     HttpClientModule,
     ThemeToggleComponent,
+    ComplexAddressComponent,
     FontSizeSelectorComponent
   ],
   providers: [FormService]
