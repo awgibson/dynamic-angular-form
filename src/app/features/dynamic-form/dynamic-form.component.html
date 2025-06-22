@@ -127,10 +127,11 @@
               <app-complex-address
                 [value]="formData[currentQuestion.id][field.id]"
                 [required]="!!field.required"
-                [showValidation]="showValidationErrors"
+                [showValidationFlag]="showValidationErrors"
                 [parentId]="currentQuestion.id"
                 [fieldId]="field.id"
-                (valueChange)="updateComplexValue(currentQuestion.id, field.id, $event)">
+                (valueChange)="updateComplexValue(currentQuestion.id, field.id, $event)"
+                (validationChange)="onComplexValidationChange(currentQuestion.id, field.id, $event)">
               </app-complex-address>
               <div *ngIf="showValidationErrors && hasError(field.id)" class="invalid-feedback">
                 {{ getErrorMessage(field.id) }}

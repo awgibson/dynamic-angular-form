@@ -38,7 +38,7 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
     this.formService.registerListener(this);
     
     // Load questions
-    this.formService.loadQuestions((success) => {
+    this.formService.loadQuestions((success: boolean) => {
       console.log('Questions loaded in component:', success);
       this.loading = false;
       
@@ -151,7 +151,18 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
     // Set the flag to show validation errors
     this.showValidationErrors = true;
     
-    // First validate the current page
+    // Explicitly validate any complex address components 
+    if (this.currentQuestion) {
+      const complexFields = this.currentQuestion.subTypes.filter((field: any) => field.type === 'complex-address' && field.required);
+      complexFields.forEach((field: any) => {
+        const addressValue = this.formData[this.currentQuestion!.id][field.id];
+        if (!this.validateComplexField(addressValue)) {
+          this.validationErrors[field.id] = `${field.label} has missing required information`;
+        }
+      });
+    }
+
+    // Now validate the current page including all complex field validations
     if (!this.validateCurrentPage()) {
       console.log('Validation failed. Cannot proceed.');
       // Scroll to top to show validation messages
@@ -197,7 +208,7 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
     
     // Silently validate the field after it's updated
     if (this.currentQuestion) {
-      const field = this.currentQuestion.subTypes.find(f => f.id === fieldId);
+      const field = this.currentQuestion.subTypes.find((f: any) => f.id === fieldId);
       if (field && field.required) {
         if (value === '' || value === undefined || value === null) {
           this.validationErrors[fieldId] = `${field.label} is required`;
@@ -221,7 +232,7 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
 
     // Validate complex field
     if (this.currentQuestion) {
-      const field = this.currentQuestion.subTypes.find(f => f.id === fieldId);
+      const field = this.currentQuestion.subTypes.find((f: any) => f.id === fieldId);
       if (field && field.required) {
         // Check if all required properties in the complex object have values
         if (!value || !this.validateComplexField(value)) {
@@ -239,18 +250,49 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
   // Helper method to validate complex fields
   validateComplexField(value: any): boolean {
     // If it's an address object, check that all required fields are filled
-    if (value.street !== undefined) {
-      return value.street && value.city && value.state && value.zipCode && value.country && value.addressType;
+    if (value && typeof value === 'object' && 'street' in value) {
+      // Validate all required fields in the address
+      const requiredFields = ['street', 'city', 'state', 'zipCode', 'addressType'];
+      for (const field of requiredFields) {
+        if (!value[field] || value[field].trim() === '') {
+          return false;
+        }
+      }
+      
+      // Validate zip code format if provided
+      if (value.zipCode && !/^\d{5}(-\d{4})?$/.test(value.zipCode)) {
+        return false;
+      }
+      
+      return true;
     }
+    
     // Add more complex field validation as needed
-    return true;
+    return false;
+  }
+  
+  // Handle validation events from complex-address component
+  onComplexValidationChange(pageId: string, fieldId: string, isValid: boolean): void {
+    if (this.currentQuestion) {
+      const field = this.currentQuestion.subTypes.find((f: any) => f.id === fieldId);
+      if (field && field.required) {
+        if (!isValid) {
+          this.validationErrors[fieldId] = `${field.label} has missing required information`;
+        } else {
+          // Clear the error if value is now valid
+          delete this.validationErrors[fieldId];
+        }
+      }
+      // Update page validity
+      this.pageValid = Object.keys(this.validationErrors).length === 0;
+    }
   }
   
   // Method to reload form data if needed
   reloadData(): void {
     this.loading = true;
     this.error = null;
-    this.formService.loadQuestions((success) => {
+    this.formService.loadQuestions((success: boolean) => {
       this.loading = false;
       if (!success) {
         this.error = 'Failed to reload form data.';
@@ -272,12 +314,20 @@ export class DynamicFormComponent implements OnInit, OnDestroy, FormEventListene
     let isValid = true;
     
     // Check each field for validation errors
-    this.currentQuestion.subTypes.forEach(field => {
+    this.currentQuestion.subTypes.forEach((field: any) => {
       if (field.required) {
         const value = this.formData[this.currentQuestion!.id][field.id];
         
-        // Check for empty values
-        if (value === '' || value === undefined || value === null) {
+        // Handle complex address component
+        if (field.type === 'complex-address') {
+          // If it's a complex address, validate all its required fields
+          if (!value || !this.validateComplexField(value)) {
+            this.validationErrors[field.id] = `${field.label} has missing required information`;
+            isValid = false;
+          }
+        } 
+        // Check for empty values on standard fields
+        else if (value === '' || value === undefined || value === null) {
           this.validationErrors[field.id] = `${field.label} is required`;
           isValid = false;
         }

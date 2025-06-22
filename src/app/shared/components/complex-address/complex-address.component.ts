@@ -21,7 +21,19 @@ export class ComplexAddressComponent implements OnInit {
   @Input() parentId: string = '';
   @Input() fieldId: string = '';
   
+  // Add setter for showValidation to validate when it changes to true
+  @Input() set showValidationFlag(value: boolean) {
+    this.showValidation = value;
+    if (value && this.required) {
+      this.validateAllFields();
+      this.emitValidationStatus();
+    }
+  }
+  
   @Output() valueChange = new EventEmitter<AddressData>();
+  
+  // Add a new output to notify parent component about validation status
+  @Output() validationChange = new EventEmitter<boolean>();
 
   states = [
     { value: 'AL', label: 'Alabama' },
@@ -69,6 +81,12 @@ export class ComplexAddressComponent implements OnInit {
     if (!this.value) {
       this.value = this.getDefaultAddress();
     }
+    
+    // Validate all fields on initialization if required
+    if (this.required) {
+      this.validateAllFields();
+      this.emitValidationStatus();
+    }
   }
 
   getDefaultAddress(): AddressData {
@@ -85,7 +103,19 @@ export class ComplexAddressComponent implements OnInit {
   updateValue(field: keyof AddressData, value: string): void {
     this.value = { ...this.value, [field]: value };
     this.validateField(field);
+    this.emitValidationStatus();
     this.valueChange.emit(this.value);
+    
+    // Always validate all fields when required is true to ensure complete validation
+    if (this.required) {
+      this.validateAllFields();
+    }
+  }
+  
+  // Emit validation status to parent component
+  emitValidationStatus(): void {
+    const isValid = Object.keys(this.validationErrors).length === 0;
+    this.validationChange.emit(isValid);
   }
 
   validateField(field: keyof AddressData): void {
@@ -101,8 +131,10 @@ export class ComplexAddressComponent implements OnInit {
   }
 
   validateAllFields(): boolean {
-    const fields: (keyof AddressData)[] = ['street', 'city', 'state', 'zipCode', 'country', 'addressType'];
-    fields.forEach(field => this.validateField(field));
+    if (this.required) {
+      const fields: (keyof AddressData)[] = ['street', 'city', 'state', 'zipCode', 'country', 'addressType'];
+      fields.forEach(field => this.validateField(field));
+    }
     return Object.keys(this.validationErrors).length === 0;
   }
 
