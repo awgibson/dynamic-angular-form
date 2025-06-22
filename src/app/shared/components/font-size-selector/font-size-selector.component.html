@@ -1,0 +1,13 @@
+<div class="font-size-selector">
+  <label for="font-size-select" class="visually-hidden">Font size</label>
+  <div class="font-size-options">
+    <button 
+      *ngFor="let size of fontSizes"
+      class="font-size-option" 
+      [class.active]="currentFontSize === size.value"
+      [attr.aria-label]="'Set font size to ' + size.label"
+      (click)="changeFontSize(size.value)">
+      <span class="size-label" [ngClass]="'text-' + size.value">A</span>
+    </button>
+  </div>
+</div>
