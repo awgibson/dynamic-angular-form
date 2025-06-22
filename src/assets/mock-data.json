@@ -1,0 +1,102 @@
+{
+  "questions": [
+    {
+      "id": "address-page",
+      "name": "Address Page",
+      "type": "group",
+      "subTypes": [
+        {
+          "type": "input",
+          "id": "address",
+          "label": "Enter your Address"
+        },
+        {
+          "type": "radio",
+          "id": "addressType",
+          "label": "Address Type",
+          "options": [
+            {
+              "value": "mailing",
+              "label": "Mailing"
+            },
+            {
+              "value": "legal",
+              "label": "Legal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "personal-info",
+      "name": "Personal Information",
+      "type": "group",
+      "subTypes": [
+        {
+          "type": "input",
+          "id": "fullName",
+          "label": "Full Name"
+        },
+        {
+          "type": "input",
+          "id": "email",
+          "label": "Email Address"
+        },
+        {
+          "type": "select",
+          "id": "age",
+          "label": "Age Range",
+          "options": [
+            {
+              "value": "18-24",
+              "label": "18-24 years"
+            },
+            {
+              "value": "25-34",
+              "label": "25-34 years"
+            },
+            {
+              "value": "35-44",
+              "label": "35-44 years"
+            },
+            {
+              "value": "45+",
+              "label": "45+ years"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "preferences",
+      "name": "Preferences",
+      "type": "group",
+      "subTypes": [
+        {
+          "type": "checkbox",
+          "id": "newsletter",
+          "label": "Subscribe to newsletter"
+        },
+        {
+          "type": "radio",
+          "id": "contactPreference",
+          "label": "Preferred contact method",
+          "options": [
+            {
+              "value": "email",
+              "label": "Email"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "text",
+              "label": "Text Message"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+<div class="dynamic-form-container">
+  <!-- Loading state -->
+  <div *ngIf="loading" class="loading-container">
+    <p>Loading form data...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="error-container">
+    <div class="alert alert-danger">
+      {{ error }}
+    </div>
+    <button class="btn btn-primary" (click)="ngOnInit()">Try Again</button>
+  </div>
+
+  <!-- Form content -->
+  <ng-container *ngIf="!loading && !error && (currentQuestion$ | async) as question">
+    <div class="card">
+      <div class="card-header">
+        <h2>{{ question.name }}</h2>
+      </div>
+      <div class="card-body">
+        <form #formElement="ngForm">
+          <div *ngFor="let field of question.subTypes" class="form-group mb-3">
+            <!-- Input field -->
+            <ng-container *ngIf="field.type === 'input'">
+              <label [for]="field.id">{{ field.label }}</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [id]="field.id"
+                name="{{field.id}}"
+                [(ngModel)]="formData[question.id][field.id]"
+                (ngModelChange)="updateFormValue(question.id, field.id, $event)">
+            </ng-container>
+
+            <!-- Radio buttons -->
+            <ng-container *ngIf="field.type === 'radio' && field.options">
+              <label class="form-label">{{ field.label }}</label>
+              <div class="radio-group">
+                <div *ngFor="let option of field.options" class="form-check">
+                  <input 
+                    type="radio" 
+                    class="form-check-input"
+                    [id]="field.id + '-' + option.value"
+                    [value]="option.value"
+                    name="{{field.id}}"
+                    [(ngModel)]="formData[question.id][field.id]"
+                    (ngModelChange)="updateFormValue(question.id, field.id, $event)">
+                  <label class="form-check-label" [for]="field.id + '-' + option.value">
+                    {{ option.label || option.value }}
+                  </label>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Select dropdown -->
+            <ng-container *ngIf="field.type === 'select' && field.options">
+              <label [for]="field.id">{{ field.label }}</label>
+              <select 
+                class="form-select" 
+                [id]="field.id"
+                name="{{field.id}}"
+                [(ngModel)]="formData[question.id][field.id]"
+                (ngModelChange)="updateFormValue(question.id, field.id, $event)">
+                <option value="">Select an option</option>
+                <option *ngFor="let option of field.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </ng-container>
+
+            <!-- Checkbox -->
+            <ng-container *ngIf="field.type === 'checkbox'">
+              <div class="form-check">
+                <input 
+                  type="checkbox" 
+                  class="form-check-input" 
+                  [id]="field.id"
+                  name="{{field.id}}"
+                  [(ngModel)]="formData[question.id][field.id]"
+                  (ngModelChange)="updateFormValue(question.id, field.id, $event)">
+                <label class="form-check-label" [for]="field.id">
+                  {{ field.label }}
+                </label>
+              </div>
+            </ng-container>
+          </div>
+        </form>
+      </div>
+      <div class="card-footer d-flex justify-content-between">
+        <button 
+          class="btn btn-secondary" 
+          [disabled]="!(canGoPrevious$ | async)"
+          (click)="previous()">
+          Back
+        </button>
+        
+        <ng-container *ngIf="canGoNext$ | async; else submitButton">
+          <button 
+            class="btn btn-primary"
+            (click)="next()">
+            Continue
+          </button>
+        </ng-container>
+        
+        <ng-template #submitButton>
+          <button 
+            class="btn btn-success"
+            (click)="onSubmit()">
+            Submit
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Debug information -->
+  <div class="debug-info" *ngIf="!loading && !error && !(currentQuestion$ | async)">
+    <h3>No question data available</h3>
+    <p>Please check the console for more information.</p>
+    <button class="btn btn-secondary" (click)="ngOnInit()">Reload Data</button>
+  </div>
+  
+  <!-- Form Data Debug View -->
+  <div class="form-data-debug">
+    <h4>Current Form Data Structure:</h4>
+    <pre>{{ formData | json }}</pre>
+  </div>
+</div>
