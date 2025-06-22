@@ -1,0 +1,9 @@
+<div class="theme-toggle">
+  <button 
+    class="theme-toggle-button" 
+    [attr.aria-label]="currentTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'"
+    (click)="toggleTheme()">
+    <span *ngIf="currentTheme === 'light'" class="icon">🌙</span>
+    <span *ngIf="currentTheme === 'dark'" class="icon">☀️</span>
+  </button>
+</div>

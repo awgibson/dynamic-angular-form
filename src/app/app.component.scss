@@ -4,14 +4,39 @@
 }
 
 .app-header {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--header-bg-color, #f1f3f5);
+  color: var(--text-color, #333333);
   padding: 15px 0;
   margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
   max-width: 1140px;
   margin: 0 auto;
   padding: 0 15px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.user-preferences {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .user-preferences {
+    margin-top: 0.75rem;
+  }
 }
