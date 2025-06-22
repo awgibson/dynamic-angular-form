@@ -12,7 +12,7 @@
         name="{{fieldId}}-street"
         [ngClass]="{'is-invalid': showValidation && hasError('street')}"
         [value]="value.street"
-        (input)="updateValue('street', $event.target.value)">
+        (input)="updateValue('street', $any($event.target).value)">
       <div *ngIf="showValidation && hasError('street')" class="invalid-feedback">
         {{ getErrorMessage('street') }}
       </div>
@@ -31,7 +31,7 @@
           name="{{fieldId}}-city"
           [ngClass]="{'is-invalid': showValidation && hasError('city')}"
           [value]="value.city"
-          (input)="updateValue('city', $event.target.value)">
+          (input)="updateValue('city', $any($event.target).value)">
         <div *ngIf="showValidation && hasError('city')" class="invalid-feedback">
           {{ getErrorMessage('city') }}
         </div>
@@ -47,7 +47,7 @@
           name="{{fieldId}}-state"
           [ngClass]="{'is-invalid': showValidation && hasError('state')}"
           [value]="value.state"
-          (change)="updateValue('state', $event.target.value)">
+          (change)="updateValue('state', $any($event.target).value)">
           <option value="">Select a state</option>
           <option *ngFor="let state of states" [value]="state.value">
             {{ state.label }}
@@ -72,7 +72,7 @@
           name="{{fieldId}}-zipCode"
           [ngClass]="{'is-invalid': showValidation && hasError('zipCode')}"
           [value]="value.zipCode"
-          (input)="updateValue('zipCode', $event.target.value)">
+          (input)="updateValue('zipCode', $any($event.target).value)">
         <div *ngIf="showValidation && hasError('zipCode')" class="invalid-feedback">
           {{ getErrorMessage('zipCode') }}
         </div>
@@ -89,7 +89,7 @@
           name="{{fieldId}}-country"
           [ngClass]="{'is-invalid': showValidation && hasError('country')}"
           [value]="value.country"
-          (input)="updateValue('country', $event.target.value)">
+          (input)="updateValue('country', $any($event.target).value)">
         <div *ngIf="showValidation && hasError('country')" class="invalid-feedback">
           {{ getErrorMessage('country') }}
         </div>

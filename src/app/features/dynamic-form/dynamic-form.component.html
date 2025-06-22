@@ -126,7 +126,7 @@
               </label>
               <app-complex-address
                 [value]="formData[currentQuestion.id][field.id]"
-                [required]="field.required"
+                [required]="!!field.required"
                 [showValidation]="showValidationErrors"
                 [parentId]="currentQuestion.id"
                 [fieldId]="field.id"
